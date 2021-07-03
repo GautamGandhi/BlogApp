@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeLeaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <h3>Blog Application</h3>
+    <hr>
+    <fieldset>
+        <p th:text="${post.title}" class="text-center"></p>
+        <div class="mx-auto md-2 text-center" style="width: 400px">
+            <p>Author= <span th:text="${post.author}"></span>, Time= <span th:text="${post.publishedAt}"></span></p>
+        </div>
+
+        <h3>Description</h3>
+        <p th:text="${post.excerpt}"></p>
+        <hr>
+        <h3>Content</h3>
+        <p th:text="${post.content}"></p>
+        <hr>
+        <p>This post is last updated at <strong><span th:text="${post.updatedAt}">.</span></strong></p>
+        <hr>
+        Tags:
+        <p th:each="_tag : ${tags}">
+            <span th:text="${_tag.name}">, </span>
+        </p>
+    </fieldset>
+
+    <hr>
+    <fieldset>
+        <legend>Comment</legend>
+        <div>
+            <h3>Add Comment</h3>
+            <form th:action="@{'/savecomment/' + ${post.id}}" th:object="${comment}" method="POST">
+                <textarea th:field="*{comment}" class="form-control mb-4 col-4" required> </textarea>
+                <input type="email" th:field="*{email}" placeholder="Email" class="form-control mb-4 col-4" required>
+                <input type="text" th:field="*{name}" placeholder="Name" class="form-control mb-4 col-4" required>
+                <button type="submit" class="btn btn-info col-2">Publish</button>
+            </form>
+        </div>
+    </fieldset>
+
+
+    <table border="1" class="table table-striped table-responsive-md">
+        <thead>
+        <tr>
+            <th>Comment</th>
+            <th>Commented At</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="_comment : ${comments}">
+            <td th:text="${_comment.comment}"></td>
+            <td th:text="${_comment.updatedAt}"></td>
+            <td th:text="${_comment.name}"></td>
+            <td th:text="${_comment.email}"></td>
+            <td><a th:href="@{/updatecomment/{commentId}(commentId=${_comment.id})}" class="btn btn-primary">Update
+                Comment</a>
+                <a th:href="@{/deletecomment/{commentId}(commentId=${_comment.id})}" class="btn btn-danger">Delete
+                    Comment</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a th:href="@{/updatepost/{id}(id=${post.id})}" class="btn btn-primary">Update Post</a>
+    <a th:href="@{/deletepost/{id}(id=${post.id})}" class="btn btn-danger">Delete Post</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeLeaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <h1>Edit Post</h1>
+    <hr>
+    <form th:action="@{/savepost/{id}(id=${id})}" th:object="${post}" method="POST">
+        <input type="text" th:field="*{title}" th:text="${post.title}" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{excerpt}" th:text="${post.excerpt}" class="form-control mb-4 col-4">
+        <textarea th:field="*{content}" th:text="${post.content}" class="form-control mb-4 col-4"></textarea><br>
+        <input type="text" th:field="*{author}" th:text="${post.author}" class="form-control mb-4 col-4">
+        <button type="submit" class="btn btn-info col-2">Publish</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.thymeleaf.org "
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>BlogApp</title>
+    <link href="../index.css"  rel="stylesheet" />
+    <!-- th:href="@{src/main/resources/static/index.css}"-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+    <div id="firstDiv">
+
+        <div style="background-color: rgb(229, 255, 236);padding:20px;">
+        <h1>Blog Application</h1>
+            <a th:href="@{/login}" > Login</a> <br>&nbsp;
+            <a th:href="@{/register}" > Register </a><br>&nbsp;
+            <div sec:authorize="hasAnyAuthority('admin', 'author')">
+                <a th:href="@{/sharePost}" > Share Post</a>
+           </div>
+        </div>
+        <div align="center" >
+
+            <h2>Post List</h2>
+            <div sec:authorize="isAuthenticated()">
+                Welcome <b><span sec:authentication="name">Username</span></b> &nbsp;
+                <i><span sec:authentication="principal.authorities">Roles</span></i>
+                <a th:href="@{/logout}">Logout</a><br>&nbsp;
+            </div>
+            <div style="background-color: rgb(249, 255, 229);padding:20px;">
+                <form action="#" th:action="@{/searchPostHere}">
+                    <input type="text" name="keyword" id="keyword" th:value="${keyword}" placeholder="Search here"/> &nbsp; &nbsp;
+                    <input type="submit" value="Search">
+                </form>
+            </div> <br>
+            <!-- filter start here -->
+             <div>
+                 <form action="#" th:action="@{/filter}" method="get">
+                     <ul>
+                         <label>Authors</label>
+                         <li th:each="author:${setOfAuthor}">
+                         <input  type="checkbox" th:value="${author}" name="authorList"/>
+                             <label th:text="${author}"></label>
+                         </li>
+                     </ul>
+                     <ul>
+                         <label>Tags</label>
+                         <li th:each="tag:${setOfTag}">
+                             <input  type="checkbox" th:value="${tag}" name="tagList"/>
+                             <label th:text="${tag}"></label>
+                         </li>
+                     </ul>
+                     <ul>
+                         <label>Date</label>
+                         <input type="datetime-local" name="startdate">
+                         <input type="datetime-local" name="enddate">
+                     </ul>
+
+                     <input type="submit" value="Apply Now">
+                 </form>
+             </div>
+            <!-- filter end here -->
+            <br>
+            <table border="1" class="table table-hover container my-2 table-responsive-md">
+                <thead class="table-light">
+                    <tr>
+                        <th><a th:href="@{'/page/' + ${currentPage} + '?sortField=title&sortDir=' + ${reverseSortDir}}">Title</a></th>
+                        <th><a th:href="@{'/page/' + ${currentPage} + '?sortField=author&sortDir=' + ${reverseSortDir}}">Author</a></th>
+                        <th><a th:href="@{'/page/' + ${currentPage} + '?sortField=content&sortDir=' + ${reverseSortDir}}">Content</a></th>
+                        <th><a th:href="@{'/page/' + ${currentPage} + '?sortField=publishedAt&sortDir=' + ${reverseSortDir}}">Publish Time</a></th>
+                        <th>Actions</th>
+                    </tr>
+                    <tbody>
+                        <tr th:each="post:${listPost}" >
+                            <td th:text="${post.title}" ></td>
+                            <td th:text="${post.author}" ></td>
+                            <td th:text="${post.content}"></td>
+                            <td th:text="${post.publishedAt}" ></td>
+                            <td>
+                                <span sec:authorize="hasAnyAuthority('admin', 'author')">
+                                <a th:href="@{/showPostForUpdate/{id}(id=${post.id})}" class="btn btn-outline-primary">Update</a>
+                                </span>
+                                <span sec:authorize="hasAnyAuthority('admin', 'author')">
+                                <a th:href="@{/deletePost/{id}(id=${post.id})}" class="btn btn-outline-danger">Delete</a>
+                                  </span>
+                                <a th:href="@{/readPost/{id}(id=${post.id})}" class="btn btn-outline-info">Read More...</a>
+                            </td>
+
+                        </tr>
+                    <tbody>
+                </thead>
+            </table>
+            <div th:if="${totalPages > 1 }" style="background-color: rgb(240,248,255);padding:20px;">
+                <div class="row col-sm 10">
+                    <div class="col-sm 2">
+                        Total Records:[[${totalRecords}]]
+                    </div>
+                    <div class="col-sm 1">
+                        <span th:each="i: ${#numbers.sequence(1,totalPages)}">
+                            <a th:if="${currentPage != i}" th:href="@{'/page/' + ${i} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]</a>
+                            <span th:unless="${currentPage !=i}">[[${i}]]</span> &nbsp;&nbsp;
+                        </span>
+                    </div>
+                    <div class="col-sm 1">
+                        <a th:if="${currentPage < totalPages}" th:href="@{'/page/'+ ${currentPage + 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Next</a>
+                        <span th:unless="${currentPage < totalPages}">Next</span>
+                    </div>
+                    <div class="col-sm 1">
+                        <a th:if="${currentPage < totalPages}" th:href="@{'/page/'+ ${totalPages} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Last</a>
+                        <span th:unless="${currentPage < totalPages}">Last</span>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+</body>
+</html>

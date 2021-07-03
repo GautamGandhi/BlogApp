@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeLeaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container my-2">
+    <h1>Blogs List</h1>
+    <a th:href="@{/newpost}" class="btn btn-primary btn-sm mb-3"> Add Post</a>
+
+    <h2>Filter</h2>
+    <form class="ui form" th:action="@{/filter}" method="post" th:object="${filter}">
+        <h3 th:text="Tags"></h3>
+        <div>
+            <span th:each="tag : ${tagFilter}">
+                <input type="checkbox" th:field="*{tagFilterList}" th:value="${tag.id}" style="display:inline-block;">
+                <label th:text="${tag.name}"></label>
+            </span>
+        </div>
+        <h3 th:text="Authors"></h3>
+        <div>
+            <span th:each="author : ${authorsFilter}">
+                <input type="checkbox" th:field="*{authorFilterList}" th:value="${author.id}"
+                       style="display:inline-block;">
+                <label th:text="${author.author}"></label>
+            </span>
+        </div>
+
+        <h3>Date & Time</h3>
+        <div>
+            <label>Start Date</label>
+            <input type="date" name="startDate" th:field="*{startDate}">
+            <label>End Date</label>
+            <input type="date" name="endDate" th:field="*{endDate}">
+        </div>
+        <div class="field">
+            <button class="ui button" type="submit">Apply Filter</button>
+        </div>
+    </form>
+
+    <form class="form-inline my-2 my-lg-0" th:action="@{/search}" method="get">
+        <input class="form-control mr-sm-2" type="search" th:name="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+
+    <table border="1" class="table table-striped table-responsive-md">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Author</th>
+            <th>
+                <a th:href="@{'/page/' + ${currentPage} + '?sortField=publishedAt&sortDir=' + ${reverseSortDir}}">
+                    Publish Time</a>
+            </th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="post : ${listPosts}">
+            <td th:text="${post.title}"></td>
+            <td th:text="${post.excerpt}"></td>
+            <td th:text="${post.author}"></td>
+            <td th:text="${post.publishedAt}"></td>
+            <td><a th:href="@{/post/{id}(id=${post.id})}" class="btn btn-primary">Read Post</a></td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${totalPages > 1}">
+        <div class="row col-sm-10">
+            <div class="col-sm-2">
+                Total Rows: [[${totalRows}]]
+            </div>
+            <div class="col-sm-1">
+                <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+                    <a th:if="${currentPage != i}"
+                       th:href="@{'/page/' + ${i}+ '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]
+                    </a>
+                    <span th:unless="${currentPage != i}">[[${i}]]</span> &nbsp; &nbsp;
+                </span>
+            </div>
+            <div class="col-sm-1">
+                <a th:if="${currentPage < totalPages}"
+                   th:href="@{'/page/' + ${currentPage + 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">
+                    Next</a>
+                <span th:unless="${currentPage < totalPages}">Next</span>
+            </div>
+            <div class="col-sm-1">
+                <a th:if="${currentPage < totalPages}"
+                   th:href="@{'/page/' + ${totalPages} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">
+                    Last</a>
+                <span th:unless="${currentPage < totalPages}">Last</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

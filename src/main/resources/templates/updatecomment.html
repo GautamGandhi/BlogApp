@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeLeaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <h1>Edit Comment</h1>
+    <hr>
+    <form th:action="@{/updatecomment/{commentId}(commentId=${commentBind.id})}" th:object="${commentBind}"
+          method="POST">
+        <input type="text" th:field="*{name}" th:text="${commentBind.name}" class="form-control mb-4 col-4">
+        <input type="email" th:field="*{email}" th:text="${commentBind.email}" class="form-control mb-4 col-4">
+        <textarea th:field="*{comment}" th:text="${commentBind.comment}" class="form-control mb-4 col-4"></textarea>
+        <br>
+        <button type="submit" class="btn btn-info col-2">Update</button>
+    </form>
+</div>
+</body>
+</html>
