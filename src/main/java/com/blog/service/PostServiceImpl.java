@@ -70,8 +70,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPostBYSearchCriteria(String tagName) {
-        return postRepository.getPostByName(tagName);
+    public List<Post> getPostBYSearchCriteria(String criteria) {
+        List<Post> postList = postRepository.getPostByTag(criteria);
+        postList.addAll(postRepository.getPostByRemainingCriteria(criteria));
+        //postRepository.getPostByName(criteria);
+        return postList;
     }
 
     @Override

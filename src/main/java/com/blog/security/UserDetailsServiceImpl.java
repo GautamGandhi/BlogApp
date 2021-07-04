@@ -1,8 +1,7 @@
-package com.blog.service;
+package com.blog.security;
 
-import com.blog.config.CustomUserDetails;
-import com.blog.repository.UserRepository;
 import com.blog.model.User;
+import com.blog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,10 +13,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.getUserByUserName(email);
+        User user = userRepository.getUserByEmail(email);
         if(user == null){
-            throw new UsernameNotFoundException("Could not found user !!");
+            throw new UsernameNotFoundException("Email not find");
         }
-        return new CustomUserDetails(user);
+        return new UserDetailsImpl(user);
     }
 }

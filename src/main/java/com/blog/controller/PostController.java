@@ -155,7 +155,7 @@ public class PostController {
         user.setEmail("gautam.gandhi.100@gmail.com");
         user.setPassword(passwordEncoder.encode("123"));
         user.setName("Gautam");
-        user.setRole("ROLE_ADMIN");
+        user.setRole("ADMIN");
         return userRepository.save(user);
     }
 
@@ -166,7 +166,7 @@ public class PostController {
         user.setEmail("gautam@gmail.com");
         user.setPassword(passwordEncoder.encode("123"));
         user.setName("Gautam");
-        user.setRole("ROLE_USER");
+        user.setRole("USER");
         return userRepository.save(user);
     }
 }
