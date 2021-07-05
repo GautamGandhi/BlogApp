@@ -66,7 +66,7 @@
             <td th:text="${_comment.name}"></td>
             <td th:text="${_comment.email}"></td>
             <td>
-                <div sec:authorize="hasAnyAuthority('ADMIN')">
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'USER')">
                     <a th:href="@{/updatecomment/{commentId}(commentId=${_comment.id})}" class="btn btn-primary">Update
                         Comment</a>
                     <a th:href="@{/deletecomment/{commentId}(commentId=${_comment.id})}" class="btn btn-danger">Delete

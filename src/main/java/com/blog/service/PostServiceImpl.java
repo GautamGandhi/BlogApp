@@ -42,13 +42,18 @@ public class PostServiceImpl implements PostService {
     public Post savePost(Post post) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user =  userRepository.getUserByEmail(authentication.getName());
-        post.setAuthor(user.getName());
+        if(user.getRole().equals("USER")) {
+            post.setAuthor(user.getName());
+        }
         post.setUpdatedAt(new Date());
         post.setPublishedAt(new Date());
         post.setPublished(true);
         post.setCreatedAt(new Date());
         post.setUserId(user.getId());
-        return this.postRepository.save(post);
+        if(user.getRole().equals("ADMIN") || user.getRole().equals("USER")){
+            return this.postRepository.save(post);
+        }
+        return null;
     }
 
     @Override

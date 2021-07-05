@@ -69,6 +69,10 @@ public class PostController {
         if (roleSet.contains("USER")) {
             model.addAttribute("role", "USER");
             post.setAuthor(userService.getName(userEmail));
+        } else{
+            model.addAttribute("role", "ADMIN");
+            model.addAttribute("post", post);
+            return "newPostAdmin";
         }
         model.addAttribute("post", post);
         return "newpost";
@@ -91,12 +95,6 @@ public class PostController {
         return "redirect:/post/" + id;
     }
 
-    @GetMapping("/deletepost/{id}")
-    public String deletePost(@PathVariable(value = "id") Long id) {
-        postService.deletePost(id);
-        return "redirect:/";
-    }
-
     @GetMapping("/post/{id}")
     public String readPost(@PathVariable(value = "id") Long postId, Model model) {
         model.addAttribute("post", postService.getPostByID(postId));
@@ -107,11 +105,30 @@ public class PostController {
         return "viewpost";
     }
 
+    @GetMapping("/deletepost/{id}")
+    public String deletePost(@PathVariable(value = "id") Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.getUserByEmail(authentication.getName());
+        Post post = postService.getPostByID(id);
+        if(user.getId() == post.getUserId() || user.getRole().equals("ADMIN")){
+            postService.deletePost(id);
+        }
+        return "redirect:/";
+    }
+
     @GetMapping("/updatepost/{id}")
     public String updatePost(@PathVariable(value = "id") Long id, Model model) {
         model.addAttribute("id", id);
         model.addAttribute("post", postService.getPostByID(id));
-        return "updatepost";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.getUserByEmail(authentication.getName());
+        Post post = postService.getPostByID(id);
+        if(user.getId() == post.getUserId()){
+            return "updatepost";
+        } else if(user.getRole().equals("ADMIN")){
+            return "updatePostAdmin";
+        }
+        return "redirect:/post/" + id;
     }
 
     @GetMapping("/page/{start}")
