@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeLeaf.org"
->
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <title>Blog Application</title>
@@ -11,7 +11,19 @@
 <body>
 <div class="container my-2">
     <h1>Blogs List</h1>
-    <a th:href="@{/newpost}" class="btn btn-primary btn-sm mb-3"> Add Post</a>
+
+    <div sec:authorize="isAuthenticated()">
+        Welcome <b><span sec:authentication="name">Username</span></b> &nbsp;
+        <i><span sec:authentication="principal.authorities">Roles</span></i>
+    </div>
+
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Logout">
+    </form>
+
+    <div sec:authorize="hasAnyAuthority('USER', 'ADMIN')">
+        <a th:href="@{/newpost}" class="btn btn-primary btn-sm mb-3"> Add Post</a>
+    </div>
 
     <h2>Filter</h2>
     <form class="ui form" th:action="@{/filter}" method="post" th:object="${filter}">
