@@ -2,12 +2,16 @@ package com.blog.service;
 
 import com.blog.model.Post;
 import com.blog.model.Tag;
+import com.blog.model.User;
 import com.blog.repository.PostRepository;
+import com.blog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -21,10 +25,12 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -34,12 +40,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post savePost(Post post) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user =  userRepository.getUserByEmail(authentication.getName());
+        post.setAuthor(user.getName());
         post.setUpdatedAt(new Date());
         post.setPublishedAt(new Date());
         post.setPublished(true);
         post.setCreatedAt(new Date());
-        Long userId = 1L;
-        post.setUserId(userId);
+        post.setUserId(user.getId());
         return this.postRepository.save(post);
     }
 
@@ -58,7 +66,11 @@ public class PostServiceImpl implements PostService {
         if (optional.isEmpty()) {
             throw new RuntimeException(" Post not found for id:: " + id);
         }
-        postRepository.deleteById(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = userRepository.getUserByEmail(authentication.getName()).getId();
+        if(optional.get().getUserId() == userId){
+            postRepository.deleteById(id);
+        }
     }
 
     @Override

@@ -4,13 +4,15 @@ import com.blog.model.Comment;
 import com.blog.model.Filter;
 import com.blog.model.Post;
 import com.blog.model.User;
-import com.blog.service.CommentServiceImpl;
-import com.blog.service.PostServiceImpl;
-import com.blog.service.PostTagServiceImpl;
-import com.blog.service.TagServiceImpl;
+import com.blog.service.*;
 import com.blog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class PostController {
@@ -29,6 +32,7 @@ public class PostController {
     private final CommentServiceImpl commentService;
     private final TagServiceImpl tagService;
     private final PostTagServiceImpl postTagService;
+    private final UserService userService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -38,11 +42,12 @@ public class PostController {
 
     @Autowired
     public PostController(PostServiceImpl postService, CommentServiceImpl commentService, TagServiceImpl tagService,
-                          PostTagServiceImpl postTagService) {
+                          PostTagServiceImpl postTagService, UserService userService) {
         this.postService = postService;
         this.commentService = commentService;
         this.tagService = tagService;
         this.postTagService = postTagService;
+        this.userService = userService;
     }
 
     @GetMapping(path = "/")
@@ -52,7 +57,20 @@ public class PostController {
 
     @GetMapping("/newpost")
     public String getNewPostForm(Model model) {
-        model.addAttribute("post", new Post());
+        Set<String> roleSet = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            roleSet = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toSet());
+        }
+        String userEmail = authentication.getName();
+        Post post = new Post();
+        assert roleSet != null;
+        if (roleSet.contains("USER")) {
+            model.addAttribute("role", "USER");
+            post.setAuthor(userService.getName(userEmail));
+        }
+        model.addAttribute("post", post);
         return "newpost";
     }
 
@@ -163,9 +181,9 @@ public class PostController {
     @ResponseBody
     public User saveUser(){
         User user = new User();
-        user.setEmail("gautam@gmail.com");
+        user.setEmail("manish@gmail.com");
         user.setPassword(passwordEncoder.encode("123"));
-        user.setName("Gautam");
+        user.setName("Manish");
         user.setRole("USER");
         return userRepository.save(user);
     }
