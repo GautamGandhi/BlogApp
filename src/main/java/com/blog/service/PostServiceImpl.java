@@ -127,7 +127,7 @@ public class PostServiceImpl implements PostService {
                 postList.retainAll(postRepository.getPostByStartDate(beginDate));
             }
         } else if (!endDate.isEmpty()) {
-            Date finishDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
+            Date finishDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
             if (postList.isEmpty()) {
                 postList.addAll(postRepository.getPostByEndDate(finishDate));
             } else {
