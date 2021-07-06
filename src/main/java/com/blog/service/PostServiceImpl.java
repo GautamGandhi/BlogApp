@@ -73,7 +73,7 @@ public class PostServiceImpl implements PostService {
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userId = userRepository.getUserByEmail(authentication.getName()).getId();
-        if (optional.get().getUserId() == userId) {
+        if (optional.get().getUserId().equals(userId)) {
             postRepository.deleteById(id);
         }
     }

@@ -33,8 +33,6 @@ public class CommentController {
         comment.setPostId(postId);
         comment.setCreatedAt(new Date());
         comment.setUpdatedAt(new Date());
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        comment.setUserId(userRepository.getUserByEmail(authentication.getName()).getId());
         commentService.saveComment(comment);
         return "redirect:/post/" + postId;
     }
@@ -43,19 +41,22 @@ public class CommentController {
     public String deleteComment(@PathVariable(value = "commentId") Long commentId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Comment comment = commentService.getCommentById(commentId);
-        long postId = commentService.getCommentById(commentId).getPostId();
-        if(userRepository.getUserByEmail(authentication.getName()).getId() == comment.getUserId()){
+        if(authentication.getName().equals(comment.getEmail())){
             commentService.deleteComment(commentId);
         }
-        return "redirect:/post/" + postId;
+        return "redirect:/post/" + comment.getPostId();
     }
 
     @GetMapping("/updatecomment/{commentId}")
     public String updateComment(@PathVariable(value = "commentId") Long commentId, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Comment comment = commentService.getCommentById(commentId);
-        model.addAttribute("commentBind", comment);
-        model.addAttribute("id", comment.getPostId());
-        return "updatecomment";
+        if(authentication.getName().equals(comment.getEmail())){
+            model.addAttribute("commentBind", comment);
+            model.addAttribute("id", comment.getPostId());
+            return "updatecomment";
+        }
+        return "redirect:/post/" + comment.getPostId();
     }
 
     @PostMapping("/updatecomment/{commentId}")
@@ -63,12 +64,11 @@ public class CommentController {
             Comment userComment) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Comment comment = commentService.getCommentById(commentId);
-        userComment.setUserId(comment.getUserId());
         userComment.setCreatedAt(comment.getCreatedAt());
         userComment.setPostId(comment.getPostId());
         userComment.setId(commentId);
         userComment.setUpdatedAt(new Date());
-        if(userRepository.getUserByEmail(authentication.getName()).getId() == comment.getUserId()){
+        if(authentication.getName().equals(comment.getEmail())){
             commentService.saveComment(userComment);
         }
         return "redirect:/post/" + userComment.getPostId();

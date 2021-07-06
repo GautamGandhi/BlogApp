@@ -15,9 +15,6 @@ public class Comment {
     @Column(name = "post_id")
     private long postId;
 
-    @Column(name = "user_id")
-    private long userId;
-
     @Column(name = "created_at")
     private Date createdAt;
 
@@ -27,13 +24,12 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(String name, String email, String comment, long postId, long userId, Date createdAt,
+    public Comment(String name, String email, String comment, long postId, Date createdAt,
                    Date updatedAt) {
         this.name = name;
         this.email = email;
         this.comment = comment;
         this.postId = postId;
-        this.userId = userId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -78,14 +74,6 @@ public class Comment {
         this.postId = postId;
     }
 
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -110,7 +98,6 @@ public class Comment {
                 ", email='" + email + '\'' +
                 ", comment='" + comment + '\'' +
                 ", postId=" + postId +
-                ", userId=" + userId +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

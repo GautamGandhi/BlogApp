@@ -4,15 +4,14 @@ import com.blog.model.Comment;
 import com.blog.model.Filter;
 import com.blog.model.Post;
 import com.blog.model.User;
-import com.blog.service.*;
 import com.blog.repository.UserRepository;
+import com.blog.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,26 +27,25 @@ public class PostController {
     public static final int LIMIT = 5;
     public static final int PAGE_NO = 1;
 
-    private final PostServiceImpl postService;
-    private final CommentServiceImpl commentService;
-    private final TagServiceImpl tagService;
-    private final PostTagServiceImpl postTagService;
+    private final PostService postService;
+    private final CommentService commentService;
+    private final TagService tagService;
+    private final PostTagService postTagService;
     private final UserService userService;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    public PostController(PostServiceImpl postService, CommentServiceImpl commentService, TagServiceImpl tagService,
-                          PostTagServiceImpl postTagService, UserService userService) {
+    public PostController(PostService postService, CommentService commentService, TagService tagService,
+                          PostTagService postTagService, UserService userService, BCryptPasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.postService = postService;
         this.commentService = commentService;
         this.tagService = tagService;
         this.postTagService = postTagService;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
     }
 
     @GetMapping(path = "/")
@@ -69,7 +67,7 @@ public class PostController {
         if (roleSet.contains("USER")) {
             model.addAttribute("role", "USER");
             post.setAuthor(userService.getName(userEmail));
-        } else{
+        } else {
             model.addAttribute("role", "ADMIN");
             model.addAttribute("post", post);
             return "newPostAdmin";
@@ -110,7 +108,7 @@ public class PostController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.getUserByEmail(authentication.getName());
         Post post = postService.getPostByID(id);
-        if(user.getId() == post.getUserId() || user.getRole().equals("ADMIN")){
+        if (user.getId() == post.getUserId() || user.getRole().equals("ADMIN")) {
             postService.deletePost(id);
         }
         return "redirect:/";
@@ -123,10 +121,10 @@ public class PostController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.getUserByEmail(authentication.getName());
         Post post = postService.getPostByID(id);
-        if(user.getId() == post.getUserId()){
-            return "updatepost";
-        } else if(user.getRole().equals("ADMIN")){
+        if (user.getRole().equals("ADMIN")) {
             return "updatePostAdmin";
+        } else if (user.getId() == post.getUserId()) {
+            return "updatepost";
         }
         return "redirect:/post/" + id;
     }
@@ -185,7 +183,7 @@ public class PostController {
 
     @RequestMapping("/saveadmin")
     @ResponseBody
-    public User saveAdmin(){
+    public User saveAdmin() {
         User user = new User();
         user.setEmail("gautam.gandhi.100@gmail.com");
         user.setPassword(passwordEncoder.encode("123"));
@@ -196,7 +194,7 @@ public class PostController {
 
     @RequestMapping("/saveuser")
     @ResponseBody
-    public User saveUser(){
+    public User saveUser() {
         User user = new User();
         user.setEmail("manish@gmail.com");
         user.setPassword(passwordEncoder.encode("123"));
