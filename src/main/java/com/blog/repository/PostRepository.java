@@ -6,16 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-
-//" +Select * from post p where id in (Select pt.post_id from post_tag pt where pt.tag_id in " +
-//            "(Select id from tag where name = :criteria))
-//            "UNION " + ""
     @Query(value = "Select * from post p where id in (Select pt.post_id from post_tag pt where pt.tag_id in (Select id from tag where name = :criteria))", nativeQuery = true)
     List<Post> getPostByTag(@Param("criteria") String criteria);
 

@@ -41,8 +41,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post savePost(Post post) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user =  userRepository.getUserByEmail(authentication.getName());
-        if(user.getRole().equals("USER")) {
+        User user = userRepository.getUserByEmail(authentication.getName());
+        if (user.getRole().equals("USER")) {
             post.setAuthor(user.getName());
         }
         post.setUpdatedAt(new Date());
@@ -50,7 +50,7 @@ public class PostServiceImpl implements PostService {
         post.setPublished(true);
         post.setCreatedAt(new Date());
         post.setUserId(user.getId());
-        if(user.getRole().equals("ADMIN") || user.getRole().equals("USER")){
+        if (user.getRole().equals("ADMIN") || user.getRole().equals("USER")) {
             return this.postRepository.save(post);
         }
         return null;
@@ -73,7 +73,7 @@ public class PostServiceImpl implements PostService {
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userId = userRepository.getUserByEmail(authentication.getName()).getId();
-        if(optional.get().getUserId() == userId){
+        if (optional.get().getUserId() == userId) {
             postRepository.deleteById(id);
         }
     }
